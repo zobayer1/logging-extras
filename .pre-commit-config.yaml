@@ -1,0 +1,14 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+-   repo: https://github.com/mgedmin/check-manifest
+    rev: "0.46"
+    hooks:
+    -   id: check-manifest
+-   repo: https://github.com/psf/black
+    rev: 21.5b1
+    hooks:
+    -   id: black
