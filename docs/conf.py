@@ -23,7 +23,7 @@ copyright = "2021, Zobayer Hasan"
 author = "Zobayer Hasan"
 
 # The full version, including alpha/beta/rc tags
-release = "v0.1.0-beta"
+release = "v0.1.1-beta"
 source_suffix = ".rst"
 master_doc = "index"
 

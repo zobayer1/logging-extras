@@ -15,20 +15,14 @@ Documentation
 -------------
 [https://logging-extras.readthedocs.io/en/latest/](https://logging-extras.readthedocs.io/en/latest/)
 
-Distribution
-------------
-
-To create a source and wheel distribution, run:
-
-    python -m pip install wheel
-    python setup.py clean sdist bdist_wheel
-
-It is recommended to use a virtualenv.
-
 Installation
 ------------
 
-Download the latest binary or source package from github [logging-extras releases](https://github.com/zobayer1/logging-extras/releases)
+Install [logging-extras](https://pypi.org/project/logging-extras/) using pip
+
+    pip install logging-extras
+
+Alternatively, download the latest binary or source package from [github](https://github.com/zobayer1/logging-extras/releases)
 
 Install wheel package with `pip`:
 
@@ -42,36 +36,8 @@ Install source package as editable:
 
 Please refer to documentation pages for available modules.
 
-Development
------------
-
-Additional development and documentation dependencies can be installed using extras. It is recommended to use a virtualenv.
-
-### Use Pre-Commit Hooks
-
-Install pre-commit hooks and dependencies:
-
-    pip install -e .[dev]
-    pre-commit install
-    pre-commit autoupdate
-    pre-commit run --all-files
-
-### Run Tests
-
-Run tests from the source with Pytest:
-
-    pip install -e .[dev]
-    pytest -s
-
-### Generate Documentation
-
-Generate documentation from the source with Sphinx:
-
-    pip install -e .[docs]
-    cd docs
-    mkdir -p _static _templates
-    make html
-    python -m http.server --directory build/html
+Module Index
+============
 
 QueueListenerHandler
 --------------------
@@ -100,7 +66,7 @@ handlers:
     filename: 'test_logger.log'
     formatter: simple
   queue_handler:
-    class: logging_.QueueListenerHandler
+    class: logging_.handlers.QueueListenerHandler
     handlers:
       - cfg://handlers.console
       - cfg://handlers.file_handler
@@ -141,6 +107,43 @@ logger.error("This is an error log")
 logger.critical("This is a critical log")
 ```
 
-### Sources
+Development
+-----------
 
-1. `QueueListenerHandler` was inspired by [Rob Blackbourn's implementation](https://rob-blackbourn.medium.com/how-to-use-python-logging-queuehandler-with-dictconfig-1e8b1284e27a).
+Additional development and documentation dependencies can be installed using extras. It is recommended to use a virtualenv.
+
+### Use Pre-Commit Hooks
+
+Install pre-commit hooks and dependencies:
+
+    pip install -e .[dev]
+    pre-commit install
+    pre-commit autoupdate
+    pre-commit run --all-files
+
+### Run Tests
+
+Run tests from the source with Pytest:
+
+    pip install -e .[dev]
+    pytest -s
+
+### Generate Documentation
+
+Generate documentation from the source with Sphinx:
+
+    pip install -e .[docs]
+    cd docs
+    mkdir -p _static _templates
+    make html
+    python -m http.server --directory build/html
+
+### Create Distribution Packages
+
+To create a source and wheel distribution, run:
+
+    git clone git@github.com:zobayer1/logging-extras.git
+    python -m pip install wheel
+    python setup.py clean sdist bdist_wheel
+
+**Note:** This project uses `setuptools-scm` to generate build versions from git tags. Build system will raise errors if you are trying to build packages outside a git repo.

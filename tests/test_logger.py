@@ -23,7 +23,7 @@ config_yaml = """
         filename: 'test_logger.log'
         formatter: simple
       queue_handler:
-        class: logging_.QueueListenerHandler
+        class: logging_.handlers.QueueListenerHandler
         handlers:
           - cfg://handlers.console
           - cfg://handlers.file_handler
