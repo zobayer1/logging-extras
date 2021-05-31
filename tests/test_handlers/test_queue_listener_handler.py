@@ -18,15 +18,10 @@ config_yaml = """
         class: logging.StreamHandler
         formatter: simple
         stream: ext://sys.stdout
-      file_handler:
-        class: logging.FileHandler
-        filename: 'test_logger.log'
-        formatter: simple
       queue_handler:
         class: logging_.handlers.QueueListenerHandler
         handlers:
           - cfg://handlers.console
-          - cfg://handlers.file_handler
         queue: cfg://objects.queue
     loggers:
       test_logger:
@@ -49,7 +44,7 @@ def logger():
     return logging.getLogger("test_logger")
 
 
-def test_logger_emits(logger, caplog):
-    """Test fails if emitted logger output could not be captured"""
+def test_logger_emits_with_queue_handler(logger, caplog):
+    """Test fails if queue handler could not emit logs"""
     logger.info("This is a test")
     assert "This is a test" in caplog.text

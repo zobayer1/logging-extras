@@ -10,11 +10,12 @@ class QueueListenerHandler(QueueHandler):
     """QueueListenerHandler class for managing a queue listener with configured handlers.
 
     This class sets up a queue listener logger handler with customizable configurations. Inspired by Rob Blackbourn's
-    [article](https://rob-blackbourn.medium.com/how-to-use-python-logging-queuehandler-with-dictconfig-1e8b1284e27a).
+    article: ``https://rob-blackbourn.medium.com/how-to-use-python-logging-queuehandler-with-dictconfig-1e8b1284e27a``
 
     Example configuration::
 
         # logging.yaml
+        version: 1
         objects:
           queue:
             class: queue.Queue
@@ -29,7 +30,7 @@ class QueueListenerHandler(QueueHandler):
             stream: ext://sys.stdout
           file_handler:
             class: logging.FileHandler
-            filename: 'config_test.log'
+            filename: test_logger.log
             formatter: simple
           queue_handler:
             class: logging_.handlers.QueueListenerHandler
@@ -43,15 +44,15 @@ class QueueListenerHandler(QueueHandler):
     def __init__(self, queue: Any, handlers: Any, respect_handler_level: bool = True, auto_run: bool = True):
         """Instantiates QueueListenerHandler object.
 
-        A simple QueueHandler subclass implementation utilizing QueueListener for configured handlers. This is helpful
-        for detaching ypur logger handlers from the main processing threads, which reduces the risk of getting blocked,
-        for example, when using slower handlers such as smtp, file, or socket handlers.
+        A simple ``QueueHandler`` subclass implementation utilizing ``QueueListener`` for configured handlers. This is
+        helpful for detaching ypur logger handlers from the main processing threads, which reduces the risk of getting
+        blocked, for example, when using slower handlers such as smtp, file, or socket handlers.
 
         Args:
             queue: A queue instance passed from configuration.
             handlers: A list of handlers passed from configuration.
-            respect_handler_level (bool): Flag for overriding logging levels specified in handlers. Default: True.
-            auto_run (bool): Flag for starting the queue listener automatically. Default: True.
+            respect_handler_level: Flag for overriding logging levels specified in handlers. Default: True.
+            auto_run: Flag for starting the queue listener automatically. Default: True.
         """
 
         _queue = self._resolve_queue(queue)
@@ -68,7 +69,7 @@ class QueueListenerHandler(QueueHandler):
         This method is implemented to avoid raising a NotImplementedError from the subclass.
 
         Args:
-            record (LogRecord): A logging.LogRecord object.
+            record: A logging.LogRecord object.
         """
 
         super().emit(record)

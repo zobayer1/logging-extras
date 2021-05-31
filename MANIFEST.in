@@ -4,6 +4,6 @@ global-exclude *.log
 recursive-exclude .github *
 include .pre-commit-config.yaml
 include CHANGELOG.rst
-recursive-include docs *.py *.rst Makefile snippets/*
+recursive-include docs *.py *.rst *.yaml Makefile
 recursive-include tests *.py
 prune **/venv

@@ -13,7 +13,7 @@ handlers:
     stream: ext://sys.stdout
   file_handler:
     class: logging.FileHandler
-    filename: 'test_logger.log'
+    filename: test_logger.log
     formatter: simple
   queue_handler:
     class: logging_.handlers.QueueListenerHandler

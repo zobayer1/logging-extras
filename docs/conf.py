@@ -23,7 +23,7 @@ copyright = "2021, Zobayer Hasan"
 author = "Zobayer Hasan"
 
 # The full version, including alpha/beta/rc tags
-release = "v0.1.1-beta"
+release = "v0.2.0-beta"
 source_suffix = ".rst"
 master_doc = "index"
 
@@ -61,3 +61,11 @@ if not os.environ.get("READTHEDOCS"):
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+# Autodoc defaults
+autodoc_default_options = {
+    "member-order": "bysource",
+    "special-members": "__init__",
+    "undoc-members": False,
+    "exclude-members": "__weakref__,__dict__",
+}

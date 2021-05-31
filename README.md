@@ -39,14 +39,74 @@ Please refer to documentation pages for available modules.
 Module Index
 ============
 
-QueueListenerHandler
---------------------
+config.YAMLConfig
+-----------------
+
+YAMLConfig class can be used for loading YAML files with custom tags. This class adds a custom envvar tag to native YAML parser which is used to evaluate environment variables. Supports one or more environment variables in the form of `${VARNAME}` or `${VARNAME:DEFAULT}` within a string. If no default value is specified, empty string is used. Default values can only be treated as plain strings.
+
+### Example configuration:
+
+File: **logging.yaml**
+```
+version: 1
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: simple
+    stream: ext://sys.stdout
+  file_handler:
+    class: logging.FileHandler
+    filename: ${LOGGING_ROOT:.}/${LOG_FILENAME}
+    formatter: simple
+loggers:
+  test_logger:
+    level: DEBUG
+    handlers:
+      - file_handler
+    propagate: no
+root:
+  level: NOTSET
+  handlers:
+    - console
+```
+
+**Note:** Ignore the backslashes as markdown must display those escape characters.
+
+### Example Usage
+
+File: **test_logger.py**
+```
+import logging
+from logging_.config import YAMLConfig
+
+with open("logging.yaml", "r") as config_file:
+    YAMLConfig(config_file.read(), silent=True)
+
+# alternatively, you can use
+# YAMLConfig.from_file("logging.yaml", silent=True)
+
+logger = logging.getLogger("test_logger")
+
+logger.debug("This is a debug log")
+logger.info("This is an info log")
+logger.warning("This is an warning log")
+logger.error("This is an error log")
+logger.critical("This is a critical log")
+```
+
+**Note:** An (optional) explicit `silent=True` flag must be set to suppress any file or parsing related exceptions to be thrown.
+
+handlers.QueueListenerHandler
+-----------------------------
 
 A simple `QueueHandler` subclass implementation utilizing `QueueListener` for configured handlers. This is helpful for detaching the logger handlers from the main threads, which reduces the risk of getting blocked, for example, when using slower handlers such as smtp, file, or socket handlers.
 
 ### Example configuration:
 
-File: [logging.yaml](./docs/snippets/logging.yaml)
+File: **logging.yaml**
 ```
 version: 1
 objects:
@@ -63,7 +123,7 @@ handlers:
     stream: ext://sys.stdout
   file_handler:
     class: logging.FileHandler
-    filename: 'test_logger.log'
+    filename: test_logger.log
     formatter: simple
   queue_handler:
     class: logging_.handlers.QueueListenerHandler
@@ -76,7 +136,7 @@ loggers:
     level: DEBUG
     handlers:
       - queue_handler
-    propagate: yes
+    propagate: no
 root:
   level: NOTSET
   handlers:
@@ -87,9 +147,7 @@ root:
 
 ### Example Usage
 
-Just load the configuration file and start logging.
-
-File: [test_logger.py](./docs/snippets/test_logger.py)
+File: **test_logger.py**
 ```
 import logging.config
 import yaml
@@ -98,7 +156,7 @@ with open("logging.yaml", "r") as config_file:
     logging_config = yaml.safe_load(config_file.read())
     logging.config.dictConfig(logging_config)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("test_logger")
 
 logger.debug("This is a debug log")
 logger.info("This is an info log")
@@ -108,7 +166,7 @@ logger.critical("This is a critical log")
 ```
 
 Development
------------
+===========
 
 Additional development and documentation dependencies can be installed using extras. It is recommended to use a virtualenv.
 

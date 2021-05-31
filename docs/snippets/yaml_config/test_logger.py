@@ -1,9 +1,11 @@
-import logging.config
-
-import yaml
+import logging
+from logging_.config import YAMLConfig
 
 with open("logging.yaml", "r") as config_file:
-    logging.config.dictConfig(yaml.safe_load(config_file.read()))
+    YAMLConfig(config_file.read(), silent=True)
+
+# alternatively, you can use
+# YAMLConfig.from_file("logging.yaml", silent=True)
 
 logger = logging.getLogger("test_logger")
 

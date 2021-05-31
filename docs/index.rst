@@ -11,6 +11,7 @@ Logging\_
 .. toctree::
    :maxdepth: 1
 
+   logging_.config
    logging_.handlers
 
 -----------------------------------------------------------
