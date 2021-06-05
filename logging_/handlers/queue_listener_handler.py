@@ -37,7 +37,7 @@ class QueueListenerHandler(QueueHandler):
             handlers:
             - cfg://handlers.console
             - cfg://handlers.file_handler
-           queue: cfg://objects.queue
+            queue: cfg://objects.queue
 
     """
 

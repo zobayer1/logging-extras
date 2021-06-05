@@ -1,3 +1,4 @@
+exclude .pyup.yml
 exclude .readthedocs.yaml
 exclude .travis.yml
 global-exclude *.log
