@@ -33,6 +33,7 @@ class YAMLConfig(object):
 
     _envvar_sub_matcher = re.compile(r"\${([^}^{]+)}")
     _envvar_tag_matcher = re.compile(r"[^$]*\${([^}^{]+)}.*")
+    _uservar_tag_matcher = re.compile(r"^~(\w*?)/")
 
     def __init__(self, config_yaml: str, **kwargs: Any):
         """Instantiates an YAMLConfig object from configuation string.
@@ -53,6 +54,8 @@ class YAMLConfig(object):
 
         yaml.add_implicit_resolver("!envvar", self._envvar_tag_matcher, None, yaml.SafeLoader)
         yaml.add_constructor("!envvar", self._envvar_constructor, yaml.SafeLoader)
+        yaml.add_implicit_resolver("!uservar", self._uservar_tag_matcher, None, yaml.SafeLoader)
+        yaml.add_constructor("!uservar", self._uservar_constructor, yaml.SafeLoader)
         try:
             logging.config.dictConfig(yaml.safe_load(config_yaml))
         except (ParserError, ValueError, TypeError):
@@ -103,3 +106,7 @@ class YAMLConfig(object):
             return os.environ.get(envparts[0], envparts[1])
 
         return self._envvar_sub_matcher.sub(replace_fn, node.value)
+
+    def _uservar_constructor(self, _loader: Any, node: Any):
+        """Similar to _envvar_constructor except it expands ~ and ~username in the way that shells do"""
+        return os.path.expanduser(node.value)
