@@ -8,7 +8,6 @@ A collection of various python logging extensions.
 ![PyPi Publish](https://github.com/zobayer1/logging-extras/actions/workflows/python-publish.yml/badge.svg)
 [![Build Status](https://travis-ci.com/zobayer1/logging-extras.svg?branch=main)](https://travis-ci.com/zobayer1/logging-extras)
 [![Documentation Status](https://readthedocs.org/projects/logging-extras/badge/?version=latest)](https://logging-extras.readthedocs.io/en/latest/?badge=latest)
-[![Updates](https://pyup.io/repos/github/zobayer1/logging-extras/shield.svg)](https://pyup.io/repos/github/zobayer1/logging-extras/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-ff69b4.svg)](https://github.com/zobayer1/logging-extras/blob/main/LICENSE)
 
