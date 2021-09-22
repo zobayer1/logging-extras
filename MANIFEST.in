@@ -1,10 +1,10 @@
-exclude .pyup.yml
 exclude .readthedocs.yaml
-exclude .travis.yml
 global-exclude *.log
 recursive-exclude .github *
 include .pre-commit-config.yaml
 include CHANGELOG.rst
+include .coveragerc
+include tox.ini
 recursive-include docs *.py *.rst *.yaml Makefile
 recursive-include tests *.py
 prune **/venv

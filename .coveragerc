@@ -1,0 +1,10 @@
+[run]
+source = logging_
+omit = logging_/version.py
+
+[report]
+show_missing = true
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    def __del__
