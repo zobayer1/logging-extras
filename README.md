@@ -7,9 +7,9 @@ A collection of various python logging extensions.
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-blue?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 ![PyPi Publish](https://github.com/zobayer1/logging-extras/actions/workflows/python-publish.yml/badge.svg)
 ![Python Builds](https://github.com/zobayer1/logging-extras/actions/workflows/python-package.yml/badge.svg)
-[![Documentation Status](https://readthedocs.org/projects/logging-extras/badge/?version=latest)](https://logging-extras.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/zobayer1/logging-extras/branch/main/graph/badge.svg?token=GKB7RKRQ81)](https://codecov.io/gh/zobayer1/logging-extras)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Documentation Status](https://readthedocs.org/projects/logging-extras/badge/?version=latest)](https://logging-extras.readthedocs.io/en/latest/?badge=latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-ff69b4.svg)](https://github.com/zobayer1/logging-extras/blob/main/LICENSE)
 
 Documentation
