@@ -76,14 +76,7 @@ class QueueListenerHandler(QueueHandler):
 
     @staticmethod
     def _resolve_queue(queue: Any) -> Any:
-        """Resolves and evaluates queue object.
-
-        Args:
-            queue: queue object passed via logging.config.dictConfig.
-
-        Returns:
-            Resolved queue object.
-        """
+        """Resolves and evaluates queue object."""
 
         if not isinstance(queue, ConvertingDict):
             return queue
@@ -102,14 +95,7 @@ class QueueListenerHandler(QueueHandler):
 
     @staticmethod
     def _resolve_handlers(handlers: Any) -> Any:
-        """Resolves and evaluates handler objects.
-
-        Args:
-            handlers: handler list passed via logging.config.dictConfig.
-
-        Returns:
-            Resolved handler list.
-        """
+        """Resolves and evaluates handler objects."""
 
         if not isinstance(handlers, ConvertingList):
             return handlers

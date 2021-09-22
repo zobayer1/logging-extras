@@ -89,17 +89,7 @@ class YAMLConfig(object):
                 return cls("", **kwargs)
 
     def _envvar_constructor(self, _loader: Any, node: Any):
-        """Constructor callback method for yaml.
-
-        Replaces environment variable name with its value. If it is not set, default value will be set.
-
-        Args:
-              _loader: the Loader object, unused.
-              node: the Node object.
-
-        Returns:
-            The transformed string.
-        """
+        """Replaces environment variable name with its value, or a default."""
 
         def replace_fn(match):
             envparts = f"{match.group(1)}:".split(":")
@@ -108,5 +98,6 @@ class YAMLConfig(object):
         return self._envvar_sub_matcher.sub(replace_fn, node.value)
 
     def _uservar_constructor(self, _loader: Any, node: Any):
-        """Similar to _envvar_constructor except it expands ~ and ~username in the way that shells do"""
+        """Eexpands ~ and ~username into user's home directory like shells do."""
+
         return os.path.expanduser(node.value)
