@@ -4,10 +4,10 @@ LOGGING EXTRAS
 A collection of various python logging extensions.
 
 [![Python](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blueviolet?logo=python&logoColor=green)](https://www.python.org)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-blue?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-![PyPi Publish](https://github.com/zobayer1/logging-extras/actions/workflows/python-publish.yml/badge.svg)
-![Python Builds](https://github.com/zobayer1/logging-extras/actions/workflows/python-package.yml/badge.svg)
+[![PyPi Publish](https://github.com/zobayer1/logging-extras/actions/workflows/python-publish.yml/badge.svg)](https://github.com/zobayer1/logging-extras/actions/workflows/python-publish.yml)
+[![Python Builds](https://github.com/zobayer1/logging-extras/actions/workflows/python-package.yml/badge.svg)](https://github.com/zobayer1/logging-extras/actions/workflows/python-package.yml)
 [![codecov](https://codecov.io/gh/zobayer1/logging-extras/branch/main/graph/badge.svg?token=GKB7RKRQ81)](https://codecov.io/gh/zobayer1/logging-extras)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-blue?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Documentation Status](https://readthedocs.org/projects/logging-extras/badge/?version=latest)](https://logging-extras.readthedocs.io/en/latest/?badge=latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-ff69b4.svg)](https://github.com/zobayer1/logging-extras/blob/main/LICENSE)
@@ -43,7 +43,7 @@ Module Index
 config.YAMLConfig
 -----------------
 
-YAMLConfig class can be used for loading YAML files with custom tags. This class adds a custom envvar tag to native YAML parser which is used to evaluate environment variables. Supports one or more environment variables in the form of `${VARNAME}` or `${VARNAME:DEFAULT}` within a string. If no default value is specified, empty string is used. Default values can only be treated as plain strings.
+YAMLConfig class can be used for loading YAML files with custom tags. This class adds a custom envvar tag to native YAML parser which is used to evaluate environment variables. Supports one or more environment variables in the form of `${VARNAME}` or `${VARNAME:DEFAULT}` within a string. If no default value is specified, empty string is used. Default values can only be treated as plain strings. YAMLConfig can also expand `~` or `~username` just like shells do, either directly hardcoded in YAML file or passed through environment variables.
 
 ### Example configuration:
 
@@ -196,6 +196,12 @@ Generate documentation from the source with Sphinx:
     mkdir -p _static _templates
     make html
     python -m http.server --directory build/html
+
+### No `requirements.txt` File
+
+This is a python library package that is compatible with a wide range of Python versions. It does not make much sense to pin dependency versions in a traditional `requirements.txt` file. Instead, this project utilizes modern python packaging paradigms with `pyproject.toml` and `setup.cfg` files. However, sometimes some IDEs (i.e. PyCharm) cannot resolve dependencies without a `requirements.txt` file. To generate a `requirements.txt` file, simply run the following command within your venv:
+
+    pip freeze > requirements.txt
 
 ### Create Distribution Packages
 

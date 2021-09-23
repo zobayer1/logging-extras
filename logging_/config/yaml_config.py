@@ -13,8 +13,10 @@ class YAMLConfig(object):
 
     This class adds a custom envvar tag to native YAML parser which is used to evaluate environment variables. Supports
     one or more environment variables in the form of ``${VARNAME}`` or ``${VARNAME:DEFAULT}`` within a string. If no
-    default value is specified, empty string is used. Default values can only be treated as plain strings. Inspired by
-    several examples from programcreek: ``https://www.programcreek.com/python/example/11269/yaml.add_constructor``
+    default value is specified, empty string is used. Default values can only be treated as plain strings. YAMLConfig
+    can also expand ``~`` or ``~user`` just like shells do, either directly hardcoded in YAML file or passed through
+    environment variables.Inspired by several examples from programcreek:
+    ``https://www.programcreek.com/python/example/11269/yaml.add_constructor``.
 
     Example configuration::
 
@@ -36,7 +38,7 @@ class YAMLConfig(object):
     _uservar_tag_matcher = re.compile(r"^~(\w*?)/")
 
     def __init__(self, config_yaml: str, **kwargs: Any):
-        """Instantiates an YAMLConfig object from configuation string.
+        """Instantiates an YAMLConfig object from configuration string.
 
         Registers implicit resolver for custom tag envvar and adds constructor for the tag. Loads logging config from
         parsed dictionary using dictConfig.
@@ -89,24 +91,17 @@ class YAMLConfig(object):
                 return cls("", **kwargs)
 
     def _envvar_constructor(self, _loader: Any, node: Any):
-        """Constructor callback method for yaml.
-
-        Replaces environment variable name with its value. If it is not set, default value will be set.
-
-        Args:
-              _loader: the Loader object, unused.
-              node: the Node object.
-
-        Returns:
-            The transformed string.
-        """
+        """Replaces environment variable name with its value, or a default."""
 
         def replace_fn(match):
+            print(match.group(0))
             envparts = f"{match.group(1)}:".split(":")
             return os.environ.get(envparts[0], envparts[1])
 
-        return self._envvar_sub_matcher.sub(replace_fn, node.value)
+        return os.path.expanduser(self._envvar_sub_matcher.sub(replace_fn, node.value))
 
-    def _uservar_constructor(self, _loader: Any, node: Any):
-        """Similar to _envvar_constructor except it expands ~ and ~username in the way that shells do"""
+    @staticmethod
+    def _uservar_constructor(_loader: Any, node: Any):
+        """Expands ~ and ~username into user's home directory like shells do."""
+
         return os.path.expanduser(node.value)

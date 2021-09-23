@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import atexit
 from logging import LogRecord
-from logging.config import ConvertingDict, ConvertingList, valid_ident
+import logging.config
 from logging.handlers import QueueHandler, QueueListener
 from typing import Any
 
@@ -10,7 +10,7 @@ class QueueListenerHandler(QueueHandler):
     """QueueListenerHandler class for managing a queue listener with configured handlers.
 
     This class sets up a queue listener logger handler with customizable configurations. Inspired by Rob Blackbourn's
-    article: ``https://rob-blackbourn.medium.com/how-to-use-python-logging-queuehandler-with-dictconfig-1e8b1284e27a``
+    article: ``https://rob-blackbourn.medium.com/how-to-use-python-logging-queuehandler-with-dictconfig-1e8b1284e27a``.
 
     Example configuration::
 
@@ -45,7 +45,7 @@ class QueueListenerHandler(QueueHandler):
         """Instantiates QueueListenerHandler object.
 
         A simple ``QueueHandler`` subclass implementation utilizing ``QueueListener`` for configured handlers. This is
-        helpful for detaching ypur logger handlers from the main processing threads, which reduces the risk of getting
+        helpful for detaching your logger handlers from the main processing threads, which reduces the risk of getting
         blocked, for example, when using slower handlers such as smtp, file, or socket handlers.
 
         Args:
@@ -75,24 +75,17 @@ class QueueListenerHandler(QueueHandler):
         super().emit(record)
 
     @staticmethod
-    def _resolve_queue(queue: Any) -> Any:
-        """Resolves and evaluates queue object.
+    def _resolve_queue(queue: Any) -> Any:  # pragma: no cover
+        """Resolves and evaluates queue object."""
 
-        Args:
-            queue: queue object passed via logging.config.dictConfig.
-
-        Returns:
-            Resolved queue object.
-        """
-
-        if not isinstance(queue, ConvertingDict):
+        if not isinstance(queue, logging.config.ConvertingDict):
             return queue
         if "__resolved_value__" in queue:
             return queue["__resolved_value__"]
         cname = queue.pop("class")
         klass = queue.configurator.resolve(cname)
         props = queue.pop(".", None)
-        kwargs = {k: queue[k] for k in queue if valid_ident(k)}
+        kwargs = {k: queue[k] for k in queue if logging.config.valid_ident(k)}
         result = klass(**kwargs)
         if props:
             for name, value in props.items():
@@ -101,16 +94,9 @@ class QueueListenerHandler(QueueHandler):
         return result
 
     @staticmethod
-    def _resolve_handlers(handlers: Any) -> Any:
-        """Resolves and evaluates handler objects.
+    def _resolve_handlers(handlers: Any) -> Any:  # pragma: no cover
+        """Resolves and evaluates handler objects."""
 
-        Args:
-            handlers: handler list passed via logging.config.dictConfig.
-
-        Returns:
-            Resolved handler list.
-        """
-
-        if not isinstance(handlers, ConvertingList):
+        if not isinstance(handlers, logging.config.ConvertingList):
             return handlers
         return [handlers[i] for i in range(len(handlers))]
