@@ -102,5 +102,4 @@ class YAMLConfig(object):
     @staticmethod
     def _uservar_constructor(_loader: Any, node: Any):
         """Expands ~ and ~username into user's home directory like shells do."""
-
         return os.path.expanduser(node.value)
