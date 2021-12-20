@@ -94,7 +94,6 @@ class YAMLConfig(object):
         """Replaces environment variable name with its value, or a default."""
 
         def replace_fn(match):
-            print(match.group(0))
             envparts = f"{match.group(1)}:".split(":")
             return os.environ.get(envparts[0], envparts[1])
 
@@ -103,5 +102,4 @@ class YAMLConfig(object):
     @staticmethod
     def _uservar_constructor(_loader: Any, node: Any):
         """Expands ~ and ~username into user's home directory like shells do."""
-
         return os.path.expanduser(node.value)
