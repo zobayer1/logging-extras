@@ -1,0 +1,15 @@
+version: 1
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+handlers: !include common-handlers.yaml
+loggers:
+  test_logger:
+    level: DEBUG
+    handlers:
+      - file_handler
+    propagate: no
+root:
+  level: NOTSET
+  handlers:
+    - console
