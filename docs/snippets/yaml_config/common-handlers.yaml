@@ -1,0 +1,8 @@
+console:
+  class: logging.StreamHandler
+  formatter: simple
+  stream: ext://sys.stdout
+file_handler:
+  class: logging.FileHandler
+  filename: ${LOGGING_ROOT:.}/${LOG_FILENAME}
+  formatter: simple
