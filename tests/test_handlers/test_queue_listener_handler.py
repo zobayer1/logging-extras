@@ -139,3 +139,22 @@ def test_atexit_stop_without_prior_manual_stop():
     assert handler._listener._thread is not None
     handler._atexit_stop()
     assert handler._listener._thread is None
+
+
+def test_raw_listener_stop_then_atexit_is_safe():
+    """Issue #26 reproduction: manual _listener.stop() then atexit must not raise.
+
+    Users historically stopped via the private listener; atexit still fires.
+    """
+    import queue as queue_module
+
+    from logging_.handlers import QueueListenerHandler
+
+    handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
+    assert handler._listener._thread is not None
+    # Exact pattern from the bug report — bypass the public stop() API.
+    handler._listener.stop()
+    assert handler._listener._thread is None
+    # atexit callback is still registered; it must no-op safely.
+    assert handler._atexit_registered is True
+    handler._atexit_stop()
