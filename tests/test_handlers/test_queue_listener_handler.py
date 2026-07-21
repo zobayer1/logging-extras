@@ -90,3 +90,38 @@ def test_emit_routes_enqueue_failure_to_handle_error():
     handler.emit(record)  # must not raise
 
     assert handled.get("record") is record
+
+
+def test_manual_stop_is_idempotent_and_safe_for_atexit():
+    """Manual stop then atexit-style stop must not raise (Python < 3.13 double-stop bug)."""
+    import queue as queue_module
+
+    from logging_.handlers import QueueListenerHandler
+
+    handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
+    assert handler._listener._thread is not None
+
+    handler.stop()
+    assert handler._listener._thread is None
+
+    # Simulate atexit running after a manual stop — must not raise.
+    handler._atexit_stop()
+    handler.stop()  # second public stop also safe
+
+
+def test_stop_unregisters_atexit_callback():
+    """After stop(), the atexit-registered callback should be unregistered."""
+    import atexit
+    import queue as queue_module
+
+    from logging_.handlers import QueueListenerHandler
+
+    handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
+    assert handler._atexit_registered is True
+
+    handler.stop()
+    assert handler._atexit_registered is False
+    # Best-effort: callback should no longer be in atexit handlers list when available.
+    handlers = getattr(atexit, "_exithandlers", None)
+    if handlers is not None:
+        assert not any(cb == handler._atexit_stop for cb, _a, _k in handlers)

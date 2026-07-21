@@ -66,9 +66,45 @@ class QueueListenerHandler(Handler):
         self.queue = self._resolve_queue(queue)
         _handlers = self._resolve_handlers(handlers)
         self._listener = QueueListener(self.queue, *_handlers, respect_handler_level=respect_handler_level)
+        self._atexit_registered = False
         if auto_run:
             self._listener.start()
-            atexit.register(self._listener.stop)
+            # Register a guarded callback rather than QueueListener.stop directly.
+            # On Python < 3.13, QueueListener.stop() is not idempotent: after the first
+            # stop, self._thread is None and a second call raises AttributeError on join.
+            atexit.register(self._atexit_stop)
+            self._atexit_registered = True
+
+    def stop(self) -> None:
+        """Stop the queue listener if it is running.
+
+        Safe to call more than once. Also unregisters the ``atexit`` callback so
+        interpreter shutdown does not call ``QueueListener.stop`` a second time
+        (which raises on Python < 3.13 after a manual stop).
+        """
+        self._stop_listener()
+        self._unregister_atexit()
+
+    def _atexit_stop(self) -> None:
+        """``atexit`` entry point: stop only if the listener thread is still alive."""
+        self._stop_listener()
+
+    def _stop_listener(self) -> None:
+        listener = getattr(self, "_listener", None)
+        if listener is None:
+            return
+        # QueueListener sets _thread to None after stop on Python < 3.13.
+        if getattr(listener, "_thread", None) is not None:
+            listener.stop()
+
+    def _unregister_atexit(self) -> None:
+        if not getattr(self, "_atexit_registered", False):
+            return
+        try:
+            atexit.unregister(self._atexit_stop)
+        except Exception:  # pragma: no cover - defensive for unusual interpreters
+            pass
+        self._atexit_registered = False
 
     def prepare(self, record: LogRecord) -> LogRecord:
         """Prepares a record for queuing.
