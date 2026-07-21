@@ -106,10 +106,12 @@ def test_manual_stop_is_idempotent_and_safe_for_atexit():
     handler.stop()
     assert handler._listener._thread is None
     assert handler._atexit_registered is False
+    assert handler._stopped is True
 
     # Simulate atexit running after a manual stop — must not raise.
     handler._atexit_stop()
     handler.stop()
+    assert handler._stopped is True
 
 
 def test_stop_unregisters_atexit_callback():
@@ -152,9 +154,11 @@ def test_raw_listener_stop_then_atexit_is_safe():
 
     handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
     assert handler._listener._thread is not None
+    assert handler._stopped is False
     # Exact pattern from the bug report — bypass the public stop() API.
     handler._listener.stop()
     assert handler._listener._thread is None
     # atexit callback is still registered; it must no-op safely.
     assert handler._atexit_registered is True
     handler._atexit_stop()
+    assert handler._stopped is True

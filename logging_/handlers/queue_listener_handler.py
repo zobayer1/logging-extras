@@ -66,6 +66,7 @@ class QueueListenerHandler(Handler):
         self.queue = self._resolve_queue(queue)
         _handlers = self._resolve_handlers(handlers)
         self._listener = QueueListener(self.queue, *_handlers, respect_handler_level=respect_handler_level)
+        self._stopped = False
         self._atexit_registered = False
         if auto_run:
             self._listener.start()
@@ -84,16 +85,34 @@ class QueueListenerHandler(Handler):
         self._unregister_atexit()
 
     def _atexit_stop(self) -> None:
-        """atexit callback: stop the listener only if it has not already been stopped."""
+        """atexit callback: stop only when this handler has not already stopped."""
         self._stop_listener()
 
     def _stop_listener(self) -> None:
+        """Idempotent stop for both public stop() and atexit.
+
+        Handles three cases:
+        1. public ``stop()`` called once or repeatedly
+        2. atexit after public ``stop()`` (callback unregistered, but still safe)
+        3. raw ``handler._listener.stop()`` then atexit (issue #26 reproduction)
+        """
+        if self._stopped:
+            return
         listener = getattr(self, "_listener", None)
         if listener is None:
+            self._stopped = True
             return
-        # On Python < 3.13, QueueListener sets _thread to None after stop().
-        if getattr(listener, "_thread", None) is not None:
-            listener.stop()
+        # Prefer an explicit running check. QueueListener sets ``_thread`` to None
+        # after stop() on Python < 3.13; on 3.13+ stop() is already idempotent.
+        thread = getattr(listener, "_thread", None)
+        if thread is not None:
+            try:
+                listener.stop()
+            except AttributeError:
+                # Listener was stopped out-of-band (e.g. raw ``_listener.stop()``)
+                # in a race with atexit on older CPython builds.
+                pass
+        self._stopped = True
 
     def _unregister_atexit(self) -> None:
         if not self._atexit_registered:
