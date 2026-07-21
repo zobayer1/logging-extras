@@ -1,15 +1,15 @@
 Handlers
 --------
 
-QueueListenerHander
-+++++++++++++++++++
+QueueListenerHandler
+++++++++++++++++++++
 
 A simple ``QueueHandler`` subclass implementation utilizing ``QueueListener`` for configured handlers. This is helpful for detaching the logger handlers from the main threads, which reduces the risk of getting blocked, for example, when using slower handlers such as smtp, file, or socket handlers.
 
 Example Usage
 *************
 
-An example YAML configuration file utilizing ``QueueListenerHander``
+An example YAML configuration file utilizing ``QueueListenerHandler``
 
 .. literalinclude:: snippets/queue_listener_handler/logging.yaml
    :caption: logging.yaml

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+import logging.config
 import os
 import re
-import logging.config
 from typing import Any
 
 import yaml

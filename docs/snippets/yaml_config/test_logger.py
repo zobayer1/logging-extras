@@ -1,4 +1,5 @@
 import logging
+
 from logging_.config import YAMLConfig
 
 with open("logging.yaml", "r") as config_file:

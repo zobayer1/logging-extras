@@ -3,7 +3,7 @@ LOGGING EXTRAS
 
 A collection of various python logging extensions.
 
-[![Python](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blueviolet?logo=python&logoColor=green)](https://www.python.org)
+[![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14%20%7C%203.15-blueviolet?logo=python&logoColor=green)](https://www.python.org)
 [![PyPi Publish](https://github.com/zobayer1/logging-extras/actions/workflows/python-publish.yml/badge.svg)](https://github.com/zobayer1/logging-extras/actions/workflows/python-publish.yml)
 [![Python Builds](https://github.com/zobayer1/logging-extras/actions/workflows/python-package.yml/badge.svg)](https://github.com/zobayer1/logging-extras/actions/workflows/python-package.yml)
 [![codecov](https://codecov.io/gh/zobayer1/logging-extras/branch/main/graph/badge.svg?token=GKB7RKRQ81)](https://codecov.io/gh/zobayer1/logging-extras)
@@ -15,6 +15,10 @@ A collection of various python logging extensions.
 Documentation
 -------------
 [https://logging-extras.readthedocs.io/en/latest/](https://logging-extras.readthedocs.io/en/latest/)
+
+Changelog
+---------
+See [CHANGELOG.rst](CHANGELOG.rst) for the release history.
 
 Installation
 ------------
