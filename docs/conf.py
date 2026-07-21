@@ -12,6 +12,8 @@
 #
 import os
 import sys
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _get_version
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -22,8 +24,12 @@ project = "logging-extras"
 copyright = "2021, Zobayer Hasan"
 author = "Zobayer Hasan"
 
-# The full version, including alpha/beta/rc tags
-release = "v0.3.0-beta"
+# The full version, including alpha/beta/rc tags. Derived from the installed
+# package metadata (setuptools_scm), so it tracks the git tag automatically.
+try:
+    release = _get_version("logging-extras")
+except PackageNotFoundError:  # package not installed (e.g. building without an install)
+    release = "0.0.0"
 source_suffix = ".rst"
 master_doc = "index"
 
