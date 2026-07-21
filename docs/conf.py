@@ -23,7 +23,7 @@ copyright = "2021, Zobayer Hasan"
 author = "Zobayer Hasan"
 
 # The full version, including alpha/beta/rc tags
-release = "v0.2.0-beta"
+release = "v0.3.0-beta"
 source_suffix = ".rst"
 master_doc = "index"
 
@@ -51,11 +51,7 @@ exclude_patterns = ["build", "venv"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 # pip install sphinx_rtd_theme
-if not os.environ.get("READTHEDOCS"):
-    import sphinx_rtd_theme
-
-    html_theme = "sphinx_rtd_theme"
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

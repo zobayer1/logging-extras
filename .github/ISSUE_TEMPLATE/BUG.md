@@ -12,7 +12,7 @@ labels: bug
 <!-- What did you expect to happen? -->
 
 **Observed behavior**
-<!-- What did happened instead? -->
+<!-- What happened instead? -->
 
 ### Reproduction
 <!-- What did you do? Provide a list of steps taken. -->

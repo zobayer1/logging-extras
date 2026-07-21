@@ -1,14 +1,21 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v5.0.0
     hooks:
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
+    -   id: check-yaml
+    -   id: check-added-large-files
 -   repo: https://github.com/mgedmin/check-manifest
-    rev: "0.47"
+    rev: "0.50"
     hooks:
     -   id: check-manifest
 -   repo: https://github.com/psf/black
-    rev: 21.9b0
+    rev: 24.10.0
     hooks:
     -   id: black
+-   repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile=black"]

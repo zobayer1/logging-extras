@@ -48,3 +48,45 @@ def test_logger_emits_with_queue_handler(logger, caplog):
     """Test fails if queue handler could not emit logs"""
     logger.info("This is a test")
     assert "This is a test" in caplog.text
+
+
+def test_queue_listener_handler_is_not_a_queuehandler_subclass():
+    """Regression: subclassing ``QueueHandler`` triggers dictConfig's native intercept on Python 3.12+.
+
+    Keeping ``QueueListenerHandler`` a plain ``logging.Handler`` is what lets the same YAML config work on
+    Python 3.8-3.15. If this ever fails, the handler will break under ``dictConfig`` on Python 3.12+.
+    """
+    from logging.handlers import QueueHandler
+
+    from logging_.handlers import QueueListenerHandler
+
+    assert issubclass(QueueListenerHandler, logging.Handler)
+    assert not issubclass(QueueListenerHandler, QueueHandler)
+
+
+def test_queue_listener_handler_auto_run_false_does_not_start_listener():
+    """Test fails if ``auto_run=False`` starts the queue listener thread."""
+    import queue as queue_module
+
+    from logging_.handlers import QueueListenerHandler
+
+    handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=False)
+    assert handler._listener._thread is None
+
+
+def test_emit_routes_enqueue_failure_to_handle_error():
+    """Test fails if a failing enqueue raises instead of going through ``handleError``."""
+    import queue as queue_module
+
+    from logging_.handlers import QueueListenerHandler
+
+    handler = QueueListenerHandler(queue_module.Queue(maxsize=1), [], auto_run=False)
+    handler.queue.put_nowait("filler")  # fill the bounded queue so put_nowait raises queue.Full
+
+    handled = {}
+    handler.handleError = lambda record: handled.setdefault("record", record)
+
+    record = logging.LogRecord("test_logger", logging.INFO, __file__, 1, "boom", None, None)
+    handler.emit(record)  # must not raise
+
+    assert handled.get("record") is record
