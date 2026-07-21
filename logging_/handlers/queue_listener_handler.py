@@ -69,41 +69,36 @@ class QueueListenerHandler(Handler):
         self._atexit_registered = False
         if auto_run:
             self._listener.start()
-            # Register a guarded callback rather than QueueListener.stop directly.
-            # On Python < 3.13, QueueListener.stop() is not idempotent: after the first
-            # stop, self._thread is None and a second call raises AttributeError on join.
+            # Do not register QueueListener.stop directly: on Python < 3.13 it is
+            # not idempotent (second call raises AttributeError after _thread is None).
             atexit.register(self._atexit_stop)
             self._atexit_registered = True
 
     def stop(self) -> None:
-        """Stop the queue listener if it is running.
+        """Stop the queue listener if it is still running.
 
-        Safe to call more than once. Also unregisters the ``atexit`` callback so
-        interpreter shutdown does not call ``QueueListener.stop`` a second time
-        (which raises on Python < 3.13 after a manual stop).
+        Safe to call more than once. Unregisters the atexit callback so interpreter
+        shutdown does not invoke the stop path again after a manual stop.
         """
         self._stop_listener()
         self._unregister_atexit()
 
     def _atexit_stop(self) -> None:
-        """``atexit`` entry point: stop only if the listener thread is still alive."""
+        """atexit callback: stop the listener only if it has not already been stopped."""
         self._stop_listener()
 
     def _stop_listener(self) -> None:
         listener = getattr(self, "_listener", None)
         if listener is None:
             return
-        # QueueListener sets _thread to None after stop on Python < 3.13.
+        # On Python < 3.13, QueueListener sets _thread to None after stop().
         if getattr(listener, "_thread", None) is not None:
             listener.stop()
 
     def _unregister_atexit(self) -> None:
-        if not getattr(self, "_atexit_registered", False):
+        if not self._atexit_registered:
             return
-        try:
-            atexit.unregister(self._atexit_stop)
-        except Exception:  # pragma: no cover - defensive for unusual interpreters
-            pass
+        atexit.unregister(self._atexit_stop)
         self._atexit_registered = False
 
     def prepare(self, record: LogRecord) -> LogRecord:

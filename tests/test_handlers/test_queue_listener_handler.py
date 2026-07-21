@@ -92,21 +92,24 @@ def test_emit_routes_enqueue_failure_to_handle_error():
     assert handled.get("record") is record
 
 
+
 def test_manual_stop_is_idempotent_and_safe_for_atexit():
-    """Manual stop then atexit-style stop must not raise (Python < 3.13 double-stop bug)."""
+    """Regression: manual stop then atexit-style stop must not raise (Python < 3.13)."""
     import queue as queue_module
 
     from logging_.handlers import QueueListenerHandler
 
     handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
     assert handler._listener._thread is not None
+    assert handler._atexit_registered is True
 
     handler.stop()
     assert handler._listener._thread is None
+    assert handler._atexit_registered is False
 
     # Simulate atexit running after a manual stop — must not raise.
     handler._atexit_stop()
-    handler.stop()  # second public stop also safe
+    handler.stop()
 
 
 def test_stop_unregisters_atexit_callback():
@@ -118,10 +121,21 @@ def test_stop_unregisters_atexit_callback():
 
     handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
     assert handler._atexit_registered is True
-
+    # Ensure our callback is registered.
+    # atexit module does not always expose handlers; unregister should still succeed.
     handler.stop()
     assert handler._atexit_registered is False
-    # Best-effort: callback should no longer be in atexit handlers list when available.
-    handlers = getattr(atexit, "_exithandlers", None)
-    if handlers is not None:
-        assert not any(cb == handler._atexit_stop for cb, _a, _k in handlers)
+    # Second unregister path: calling stop again must remain safe.
+    handler.stop()
+
+
+def test_atexit_stop_without_prior_manual_stop():
+    """atexit path should stop a still-running listener cleanly."""
+    import queue as queue_module
+
+    from logging_.handlers import QueueListenerHandler
+
+    handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
+    assert handler._listener._thread is not None
+    handler._atexit_stop()
+    assert handler._listener._thread is None
