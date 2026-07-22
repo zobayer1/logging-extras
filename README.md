@@ -116,7 +116,7 @@ handlers.QueueListenerHandler
 > Python 3.8 – 3.11** that provides the same end-to-end dictConfig-based queue
 > setup on those older runtimes.
 
-A simple `QueueHandler` subclass implementation utilizing `QueueListener` for configured handlers. This is helpful for detaching the logger handlers from the main threads, which reduces the risk of getting blocked, for example, when using slower handlers such as smtp, file, or socket handlers.
+A simple queue-logging handler utilizing `QueueListener` for configured handlers (intentionally subclasses `logging.Handler`, not `logging.handlers.QueueHandler`, so Python 3.12+ `dictConfig` does not special-case construction). This is helpful for detaching the logger handlers from the main threads, which reduces the risk of getting blocked, for example, when using slower handlers such as smtp, file, or socket handlers.
 
 ### Example configuration:
 
