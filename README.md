@@ -107,6 +107,15 @@ logger.critical("This is a critical log")
 handlers.QueueListenerHandler
 -----------------------------
 
+> **Note:** On **Python 3.12+**, the standard library's `logging.config.dictConfig`
+> supports queue logging natively (see [Configuring QueueHandler and
+> QueueListener](https://docs.python.org/3/library/logging.config.html#configuring-queuehandler-and-queuelistener)),
+> so users on 3.12+ can — and generally should — use the stdlib directly.
+>
+> `logging-extras`'s `QueueListenerHandler` is primarily a **backport for
+> Python 3.8 – 3.11** that provides the same end-to-end dictConfig-based queue
+> setup on those older runtimes.
+
 A simple `QueueHandler` subclass implementation utilizing `QueueListener` for configured handlers. This is helpful for detaching the logger handlers from the main threads, which reduces the risk of getting blocked, for example, when using slower handlers such as smtp, file, or socket handlers.
 
 ### Example configuration:
