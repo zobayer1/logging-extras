@@ -76,16 +76,23 @@ class QueueListenerHandler(Handler):
             self._atexit_registered = True
 
     def stop(self) -> None:
-        """Stop the queue listener if it is still running.
+        """Stop the queue listener and unregister the atexit callback.
 
-        Safe to call more than once. Unregisters the atexit callback so interpreter
-        shutdown does not invoke the stop path again after a manual stop.
+        Safe to call more than once. After ``stop()`` returns, the registered
+        atexit callback (if any) will not be invoked at interpreter shutdown,
+        so the listener thread is not stopped a second time.
         """
         self._stop_listener()
         self._unregister_atexit()
 
     def _atexit_stop(self) -> None:
-        """atexit callback: stop only when this handler has not already stopped."""
+        """atexit entry point: stop the listener iff it is still in the running state.
+
+        "Running" means ``self._stopped`` is False and the underlying
+        ``QueueListener`` still has a non-None ``_thread``. Safe to run after
+        a manual ``stop()`` (the callback is unregistered, so this is only
+        reachable if someone disabled the unregister path).
+        """
         self._stop_listener()
 
     def _stop_listener(self) -> None:
