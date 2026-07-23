@@ -66,9 +66,66 @@ class QueueListenerHandler(Handler):
         self.queue = self._resolve_queue(queue)
         _handlers = self._resolve_handlers(handlers)
         self._listener = QueueListener(self.queue, *_handlers, respect_handler_level=respect_handler_level)
+        self._stopped = False
+        self._atexit_registered = False
         if auto_run:
             self._listener.start()
-            atexit.register(self._listener.stop)
+            # Do not register QueueListener.stop directly: on Python < 3.13 it is
+            # not idempotent (second call raises AttributeError after _thread is None).
+            atexit.register(self._atexit_stop)
+            self._atexit_registered = True
+
+    def stop(self) -> None:
+        """Stop the queue listener and unregister the atexit callback.
+
+        Safe to call more than once. After ``stop()`` returns, the registered
+        atexit callback (if any) will not be invoked at interpreter shutdown,
+        so the listener thread is not stopped a second time.
+        """
+        self._stop_listener()
+        self._unregister_atexit()
+
+    def _atexit_stop(self) -> None:
+        """atexit entry point: stop the listener iff it is still in the running state.
+
+        "Running" means ``self._stopped`` is False and the underlying
+        ``QueueListener`` still has a non-None ``_thread``. Safe to run after
+        a manual ``stop()`` (the callback is unregistered, so this is only
+        reachable if someone disabled the unregister path).
+        """
+        self._stop_listener()
+
+    def _stop_listener(self) -> None:
+        """Idempotent stop for both public stop() and atexit.
+
+        Handles three cases:
+        1. public ``stop()`` called once or repeatedly
+        2. atexit after public ``stop()`` (callback unregistered, but still safe)
+        3. raw ``handler._listener.stop()`` then atexit (issue #26 reproduction)
+        """
+        if self._stopped:
+            return
+        listener = getattr(self, "_listener", None)
+        if listener is None:
+            self._stopped = True
+            return
+        # Prefer an explicit running check. QueueListener sets ``_thread`` to None
+        # after stop() on Python < 3.13; on 3.13+ stop() is already idempotent.
+        thread = getattr(listener, "_thread", None)
+        if thread is not None:
+            try:
+                listener.stop()
+            except AttributeError:
+                # Listener was stopped out-of-band (e.g. raw ``_listener.stop()``)
+                # in a race with atexit on older CPython builds.
+                pass
+        self._stopped = True
+
+    def _unregister_atexit(self) -> None:
+        if not self._atexit_registered:
+            return
+        atexit.unregister(self._atexit_stop)
+        self._atexit_registered = False
 
     def prepare(self, record: LogRecord) -> LogRecord:
         """Prepares a record for queuing.

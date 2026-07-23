@@ -90,3 +90,75 @@ def test_emit_routes_enqueue_failure_to_handle_error():
     handler.emit(record)  # must not raise
 
     assert handled.get("record") is record
+
+
+
+def test_manual_stop_is_idempotent_and_safe_for_atexit():
+    """Regression: manual stop then atexit-style stop must not raise (Python < 3.13)."""
+    import queue as queue_module
+
+    from logging_.handlers import QueueListenerHandler
+
+    handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
+    assert handler._listener._thread is not None
+    assert handler._atexit_registered is True
+
+    handler.stop()
+    assert handler._listener._thread is None
+    assert handler._atexit_registered is False
+    assert handler._stopped is True
+
+    # Simulate atexit running after a manual stop — must not raise.
+    handler._atexit_stop()
+    handler.stop()
+    assert handler._stopped is True
+
+
+def test_stop_unregisters_atexit_callback():
+    """After stop(), the atexit-registered callback should be unregistered."""
+    import atexit
+    import queue as queue_module
+
+    from logging_.handlers import QueueListenerHandler
+
+    handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
+    assert handler._atexit_registered is True
+    # Ensure our callback is registered.
+    # atexit module does not always expose handlers; unregister should still succeed.
+    handler.stop()
+    assert handler._atexit_registered is False
+    # Second unregister path: calling stop again must remain safe.
+    handler.stop()
+
+
+def test_atexit_stop_without_prior_manual_stop():
+    """atexit path should stop a still-running listener cleanly."""
+    import queue as queue_module
+
+    from logging_.handlers import QueueListenerHandler
+
+    handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
+    assert handler._listener._thread is not None
+    handler._atexit_stop()
+    assert handler._listener._thread is None
+
+
+def test_raw_listener_stop_then_atexit_is_safe():
+    """Issue #26 reproduction: manual _listener.stop() then atexit must not raise.
+
+    Users historically stopped via the private listener; atexit still fires.
+    """
+    import queue as queue_module
+
+    from logging_.handlers import QueueListenerHandler
+
+    handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
+    assert handler._listener._thread is not None
+    assert handler._stopped is False
+    # Exact pattern from the bug report — bypass the public stop() API.
+    handler._listener.stop()
+    assert handler._listener._thread is None
+    # atexit callback is still registered; it must no-op safely.
+    assert handler._atexit_registered is True
+    handler._atexit_stop()
+    assert handler._stopped is True
