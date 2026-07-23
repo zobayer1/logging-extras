@@ -11,6 +11,16 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # Trusted Publishing (OIDC) requires an OIDC token to be issued for the
+    # job. ``contents: read`` keeps the checkout step working without
+    # granting the workflow any extra write surface. See
+    # https://docs.pypi.org/trusted-publishers/ for the PyPI-side setup
+    # (one-time: add a Trusted Publisher for this repo + workflow in the
+    # PyPI project settings).
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
     - uses: actions/checkout@v5
       with:
@@ -22,11 +32,8 @@ jobs:
     - name: Install build tooling
       run: |
         python -m pip install --upgrade pip
-        pip install build twine
+        pip install build
     - name: Build
       run: python -m build
     - name: Publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: twine upload --skip-existing dist/*
+      uses: pypa/gh-action-pypi-publish@release/v1
