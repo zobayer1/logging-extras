@@ -4,7 +4,17 @@ Handlers
 QueueListenerHandler
 ++++++++++++++++++++
 
-A simple ``QueueHandler`` subclass implementation utilizing ``QueueListener`` for configured handlers. This is helpful for detaching the logger handlers from the main threads, which reduces the risk of getting blocked, for example, when using slower handlers such as smtp, file, or socket handlers.
+
+.. note::
+
+   **Python 3.12+:** the standard library can configure a ``QueueHandler`` with an
+   attached ``QueueListener`` via :mod:`logging.config` (see
+   `Configuring QueueHandler and QueueListener
+   <https://docs.python.org/3/library/logging.config.html#configuring-queuehandler-and-queuelistener>`_).
+   Prefer that native setup on 3.12+. ``QueueListenerHandler`` is primarily a
+   **backport for Python 3.8–3.11** (and remains usable elsewhere if you want its API).
+
+A simple queue-logging helper utilizing ``QueueListener`` for configured handlers. This is helpful for detaching the logger handlers from the main threads, which reduces the risk of getting blocked, for example, when using slower handlers such as smtp, file, or socket handlers.
 
 Example Usage
 *************
