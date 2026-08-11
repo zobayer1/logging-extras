@@ -1,5 +1,9 @@
-v0.4.1-beta (unreleased)
-++++++++++++++++++++++++
+v1.0.0 (2026-08-11)
++++++++++++++++++++
+
+First stable release. The library's scope is considered complete: YAML-based logging configuration
+plus a ``QueueListenerHandler`` backport for Python versions that predate the standard library's
+native queue support.
 
 Changes
 
@@ -14,9 +18,8 @@ Changes
   <https://docs.pypi.org/trusted-publishers/>`_ instead of stored ``PYPI_USERNAME`` / ``PYPI_PASSWORD``
   secrets. The ``.github/workflows/python-publish.yml`` job now requests an OIDC token
   (``permissions: id-token: write``) and publishes through ``pypa/gh-action-pypi-publish``. No
-  long-lived credentials are required in the repository secrets. After merging, the maintainer
-  should add a Trusted Publisher for this repo / workflow in the PyPI project settings and then
-  remove the now-unused ``PYPI_USERNAME`` / ``PYPI_PASSWORD`` secrets.
+  long-lived credentials are required in the repository secrets.
+* Promote the ``Development Status`` classifier from ``4 - Beta`` to ``5 - Production/Stable``.
 
 v0.4.0-beta (2026-07-22)
 ++++++++++++++++++++++++
