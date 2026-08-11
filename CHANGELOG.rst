@@ -1,16 +1,3 @@
-v0.4.0-beta (2026-07-22)
-++++++++++++++++++++++++
-
-Changes
-
-* Support Python 3.8 through 3.15 (dropped 3.6 and 3.7).
-* ``QueueListenerHandler`` no longer subclasses ``logging.handlers.QueueHandler``. Since Python 3.12
-  ``logging.config.dictConfig`` special-cases ``QueueHandler`` subclasses and takes over their construction,
-  which broke this handler. It now subclasses ``logging.Handler`` directly so the same YAML configuration
-  works on all supported versions.
-* Require ``PyYAML>=5.3`` on Python < 3.10 and ``PyYAML>=6.0`` on Python >= 3.10, so projects on older
-  interpreters are not forced to upgrade an existing PyYAML 5.x (older PyYAML cannot install on 3.10+ anyway).
-
 v0.4.1-beta (unreleased)
 ++++++++++++++++++++++++
 
@@ -24,7 +11,8 @@ Changes
   should add a Trusted Publisher for this repo / workflow in the PyPI project settings and then
   remove the now-unused ``PYPI_USERNAME`` / ``PYPI_PASSWORD`` secrets.
 
-
+v0.4.0-beta (2026-07-22)
+++++++++++++++++++++++++
 
 Changes
 
