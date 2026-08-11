@@ -90,3 +90,19 @@ def test_emit_routes_enqueue_failure_to_handle_error():
     handler.emit(record)  # must not raise
 
     assert handled.get("record") is record
+
+
+def test_manual_stop_is_idempotent_with_atexit():
+    """Manual stop() must not raise when atexit later invokes stop() again (issue #26)."""
+    import queue as queue_module
+
+    from logging_.handlers import QueueListenerHandler
+
+    handler = QueueListenerHandler(queue_module.Queue(-1), [], auto_run=True)
+    assert handler._listener._thread is not None
+
+    handler.stop()  # first stop (manual)
+    assert handler._listener._thread is None
+
+    handler.stop()  # second stop (simulates atexit / double-stop)
+    assert handler._listener._thread is None

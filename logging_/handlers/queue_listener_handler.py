@@ -66,9 +66,31 @@ class QueueListenerHandler(Handler):
         self.queue = self._resolve_queue(queue)
         _handlers = self._resolve_handlers(handlers)
         self._listener = QueueListener(self.queue, *_handlers, respect_handler_level=respect_handler_level)
+        self._atexit_registered = False
         if auto_run:
             self._listener.start()
-            atexit.register(self._listener.stop)
+            # Register a guarded stop so a manual stop() + interpreter exit
+            # does not double-call QueueListener.stop() (not idempotent < 3.13).
+            atexit.register(self.stop)
+            self._atexit_registered = True
+
+    def stop(self) -> None:
+        """Stop the queue listener safely, even if already stopped.
+
+        Unregisters the atexit callback first so interpreter shutdown will not
+        invoke ``QueueListener.stop`` a second time. On Python < 3.13 a second
+        ``stop()`` raises ``AttributeError`` because ``_thread`` is already
+        ``None`` after the first call.
+        """
+        if self._atexit_registered:
+            try:
+                atexit.unregister(self.stop)
+            except Exception:  # pragma: no cover - best effort on exotic interpreters
+                pass
+            self._atexit_registered = False
+
+        if self._listener._thread is not None:
+            self._listener.stop()
 
     def prepare(self, record: LogRecord) -> LogRecord:
         """Prepares a record for queuing.
