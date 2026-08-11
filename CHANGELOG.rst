@@ -3,6 +3,13 @@ v0.4.1-beta (unreleased)
 
 Changes
 
+* Fix ``AttributeError`` raised at interpreter shutdown when a ``QueueListenerHandler`` listener had
+  already been stopped manually. ``QueueListener.stop()`` is not idempotent on Python < 3.13, so the
+  ``atexit``-registered callback failed on the second call. ``QueueListenerHandler`` now exposes an
+  idempotent ``stop()`` that unregisters its ``atexit`` callback and only stops a listener whose
+  thread is still running.
+* Document ``QueueListenerHandler`` as a backport for Python 3.8 - 3.11 and point users on Python
+  3.12+ to the standard library's native ``dictConfig`` queue support.
 * Publish to PyPI via `Trusted Publishing (OIDC)
   <https://docs.pypi.org/trusted-publishers/>`_ instead of stored ``PYPI_USERNAME`` / ``PYPI_PASSWORD``
   secrets. The ``.github/workflows/python-publish.yml`` job now requests an OIDC token
