@@ -1,3 +1,16 @@
+v0.4.1-beta (unreleased)
+++++++++++++++++++++++++
+
+Changes
+
+* Publish to PyPI via `Trusted Publishing (OIDC)
+  <https://docs.pypi.org/trusted-publishers/>`_ instead of stored ``PYPI_USERNAME`` / ``PYPI_PASSWORD``
+  secrets. The ``.github/workflows/python-publish.yml`` job now requests an OIDC token
+  (``permissions: id-token: write``) and publishes through ``pypa/gh-action-pypi-publish``. No
+  long-lived credentials are required in the repository secrets. After merging, the maintainer
+  should add a Trusted Publisher for this repo / workflow in the PyPI project settings and then
+  remove the now-unused ``PYPI_USERNAME`` / ``PYPI_PASSWORD`` secrets.
+
 v0.4.0-beta (2026-07-22)
 ++++++++++++++++++++++++
 
